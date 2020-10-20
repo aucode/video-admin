@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.video.system.mapper.SysQuestionLibraryMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="QuestionLibraryMap" type="com.video.system.domain.SysQuestionLibrary">
+        <id column="library_id" property="libraryId" />
+        <result column="title" property="title" />
+        <result column="class_id" property="classId"/>
+    </resultMap>
+
+    <resultMap id="SelectTopicMap" type="com.video.system.domain.SysSelectTopic">
+        <id column="topic_id" property="topicId" />
+        <result column="title" property="title" />
+        <result column="analyze" property="analyze"/>
+        <result column="library_id" property="libraryId"/>
+        <collection property="selectOptions" resultMap="selectOptionsMap" />
+    </resultMap>
+    <resultMap id="selectOptionsMap" type="com.video.system.domain.SysSelectOptions">
+        <id property="options_id" column="optionsId" />
+        <result property="options" column="options" />
+        <result property="topic_id" column="topicId" />
+    </resultMap>
+    <resultMap id="ApplicationQuestionsMap" type="com.video.system.domain.SysApplicationQuestions">
+        <id property="options_id" column="optionsId" />
+        <result property="options" column="options" />
+        <result property="analysis" column="analysis" />
+        <result property="library_id" column="libraryId" />
+    </resultMap>
+    <!-- 通用查询结果列 -->
+    <sql id="QuestionLibrarySQL">
+        library_id, title,class_id
+    </sql>
+    <select id="selectQuestionLibraryList" parameterType="com.video.system.domain.SysQuestionLibrary"
+            resultMap="QuestionLibraryMap">
+        select
+        <include refid="QuestionLibrarySQL"></include>
+        FROM sys_question_library
+        <if test="classId != null and classId != ''">
+            where class_id = #{classId}
+        </if>
+    </select>
+    <insert id="addQuestionLibraryInfo" parameterType="com.video.system.domain.SysQuestionLibrary">
+                INSERT INTO sys_question_library(title,class_id)
+                       VALUES(#{title}, #{classId});
+    </insert>
+    <select id="selectQuestionLibraryById" parameterType="Long"
+            resultMap="QuestionLibraryMap">
+        select
+        <include refid="QuestionLibrarySQL"></include>
+        FROM sys_question_library
+        <if test="libraryId != null and libraryId != ''">
+            where library_id = #{libraryId}
+        </if>
+    </select>
+    <update id="editSaveQuestionLibraryInfo" parameterType="com.video.system.domain.SysQuestionLibrary">
+        UPDATE sys_question_library SET title = #{title},class_id = #{classId} where library_id = #{libraryId}
+    </update>
+    <select id="getLibraryLists" parameterType="com.video.system.domain.SysQuestionLibrary" resultMap="SelectTopicMap">
+        select
+            st.topic_id,st.title,st.library_id,st.analyze,so.options,so.options_id
+        from sys_select_topic st
+        join sys_select_options so
+            on st.topic_id = so.topic_id
+                WHERE st.library_id = ${libraryId};
+    </select>
+    <select id="getLibraryapplicationLists"  parameterType="com.video.system.domain.SysQuestionLibrary" resultMap="ApplicationQuestionsMap" >
+        select
+            *
+        from sys_application_questions
+                WHERE library_id = ${libraryId};
+    </select>
+</mapper>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <th:block th:include="include :: header('新增题库')" />
+    <th:block th:include="include :: select2-css" />
+</head>
+<body>
+<form class="form-horizontal m" id="form-library-add">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">新增题库：</label>
+            <div class="col-sm-9" style="width: 72%;float: right;">
+                <input type="text" name="title" id="title" class="form-control" placeholder="请输入题库" required>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">课程类型：</label>
+            <div class="col-sm-9" style="width: 72%;float: right;">
+                <select id="classId" name="classId" class="form-control select2-multiple" required>
+                    <option  ></option>
+                    <option th:each="classitem:${courseclass}" th:value="${classitem.classId}"
+                            th:text="${classitem.className}" ></option>
+                </select>
+            </div>
+        </div>
+    </div>
+    </div>
+</form>
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: select2-js" />
+</body>
+<script>
+    var prefix = ctx + "question/library";
+    $(function() {
+        $('#classId').select2({
+            placeholder: "请选择课程类型",
+            allowClear: true
+        });
+    });
+    function submitHandler() {
+        if ($.validate.form("form-library-add")) {
+            var formData = new FormData();
+            formData.append('title', $("#title").val());
+            formData.append('classId', $("#classId").val());
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : prefix + "/add",
+                data : formData,
+                processData: false,
+                contentType: false,
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    $.operate.successCallback(data);
+                }
+            });
+        }
+    }
+
+</script>
+</html>

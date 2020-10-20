@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <th:block th:include="include :: header('新增类型')" />
+    <th:block th:include="include :: select2-css" />
+</head>
+<body>
+<form class="form-horizontal m" id="form-course-class-add">
+<div class="col-md-6">
+    <div class="form-group">
+        <label class="col-sm-3 control-label">课程类型：</label>
+        <div class="col-sm-9" style="width: 72%;float: right;">
+            <input type="text" name="className" class="form-control" placeholder="请输入课程类型" required>
+        </div>
+    </div>
+</div>
+</form>
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: select2-js" />
+<script type="text/javascript">
+    var prefix = ctx + "curriculum/courseclass";
+    function submitHandler() {
+        if ($.validate.form("form-course-class-add")) {
+            add();
+        }
+    }
+    function add() {
+        var data = $("#form-user-add").serializeArray();
+        var className = $("input[name='className']").val();
+        data.push({"name": "className", "value": className});
+        $.ajax({
+            cache : true,
+            type : "POST",
+            url : prefix + "/add",
+            data : {
+                "className": className
+            },
+            async : false,
+            error : function(request) {
+                $.modal.alertError("系统错误");
+            },
+            success : function(data) {
+                $.operate.successCallback(data);
+            }
+        });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <th:block th:include="include :: header('课程管理')" />
+    <th:block th:include="include :: select2-css" />
+    <th:block th:include="include :: jasny-bootstrap-css" />
+</head>
+<body>
+<div class="main-content">
+    <form id="form-course-add" class="form-horizontal">
+        <input name="courseId" type="hidden" id="courseId"/>
+        <h4 class="form-header h4">基本信息</h4>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label is-required">课程名称：</label>
+                    <div class="col-sm-8">
+                        <input name="courseName" id="courseName" placeholder="请请输入课程名称" class="form-control" type="text"
+                               maxlength="30" required>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label is-required">课程类型：</label>
+                    <div class="col-sm-8">
+                        <div class="input-group">
+                            <select id="classId" name="classId" class="form-control select2-multiple" required>
+                                <option  ></option>
+                                <option th:each="classitem:${courseclass}" th:value="${classitem.classId}"
+                                        th:text="${classitem.className}" ></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label is-required">讲师：</label>
+                    <div class="col-sm-8">
+                        <select id="courseUserId" name="courseUserId" class="form-control select2-multiple" required>
+                            <option  ></option>
+                            <option th:each="useritem:${user}" th:value="${useritem.userId}"
+                                    th:text="${useritem.userName}" ></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">课程封面：</label>
+                    <div class="col-sm-8">
+                        <div class="form-group">
+                            <label class="font-noraml">图片预览</label>
+                            <div class="fileinput fileinput-new" data-provides="fileinput">
+                                <div class="fileinput-new thumbnail" style="width: 140px; height: 140px;">
+                                    <img src="" name="courseUrl">
+                                </div>
+                                <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;"></div>
+                                <div>
+                                    <span class="btn btn-white btn-file"><span class="fileinput-new">选择图片</span><span
+                                            class="fileinput-exists">更改</span><input type="file" id="courseUrl" required></span>
+                                    <a href="#" class="btn btn-white fileinput-exists" data-dismiss="fileinput">清除</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <h4 class="form-header h4">简介</h4>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label class="col-xs-2 control-label">内容简介：</label>
+                    <div class="col-xs-10">
+                        <textarea name="courseDescription" id="courseDescription" maxlength="500"
+                                  class="form-control" rows="3" required></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="row">
+    <div class="col-sm-offset-5 col-sm-10">
+        <button type="button" class="btn btn-sm btn-primary" onclick="submitHandler()"><i class="fa fa-check"></i>保 存</button>&nbsp;
+        <button type="button" class="btn btn-sm btn-danger" onclick="closeItem()"><i class="fa fa-reply-all"></i>关 闭 </button>
+    </div>
+</div>
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: select2-js" />
+<th:block th:include="include :: jasny-bootstrap-js" />
+<th:block th:include="include :: bootstrap-suggest-js" />
+<th:block th:include="include :: bootstrap-typeahead-js" />
+<script type="text/javascript">
+    $(function() {
+        $('#classId').select2({
+            placeholder: "请选择课程类型",
+            allowClear: true
+        });
+    });
+    $(function() {
+        $('#courseUserId').select2({
+            placeholder: "请选择讲师",
+            allowClear: true
+        });
+    });
+
+    var prefix = ctx + "curriculum/course";
+    function submitHandler() {
+        if ($.validate.form("form-course-add")) {
+            add();
+        }
+    }
+    function add() {
+        var formData = new FormData();
+        if ($('#courseUrl')[0].files[0] == null) {
+            $.modal.alertWarning("请先选择文件路径");
+            return false;
+        }
+        formData.append('courseId', $("#courseId").val());
+        formData.append('courseName', $("#courseName").val());
+        formData.append('classId', $("#classId").val());
+        formData.append('courseUserId', $("#courseUserId").val());
+        formData.append('courseDescription', $("#courseDescription").val());
+        formData.append('courseUrl', $("#courseUrl").val());
+        formData.append('file', $('#courseUrl')[0].files[0]);
+
+        var data = $("#form-user-add").serializeArray();
+        var className = $("input[name='className']").val();
+        data.push({"name": "className", "value": className});
+        $.ajax({
+            cache : true,
+            type : "POST",
+            url : prefix + "/add",
+            data : formData,
+            processData: false,
+            contentType: false,
+            error : function(request) {
+                $.modal.alertError("系统错误");
+            },
+            success : function(data) {
+                $.operate.successCallback(data);
+            }
+        });
+    }
+</script>
+</body>
+</html>

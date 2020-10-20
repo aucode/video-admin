@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('添加选择题')" />
+    <th:block th:include="include :: datetimepicker-css" />
+</head>
+<body class="gray-bg">
+<div class="main-content">
+    <form id="form-add" class="form-horizontal">
+        <input name="libraryId" th:value="${libraryId}" type="hidden" id="libraryId"/>
+        <h4 class="form-header h4">选择题</h4>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label class="col-xs-2 control-label">题目：</label>
+                    <div class="col-xs-10">
+                        <textarea name="title" maxlength="500" class="form-control" rows="3" required></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label class="col-xs-2 control-label">解析：</label>
+                    <div class="col-xs-10">
+                        <textarea name="analyze" maxlength="500" class="form-control" rows="3" required></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <h4 class="form-header h4">选项</h4>
+        <div class="row">
+            <div class="col-sm-12">
+                <button type="button" class="btn btn-white btn-sm" onclick="addColumn()"><i class="fa fa-plus"> 增加</i></button>
+                <button type="button" class="btn btn-white btn-sm" onclick="sub.delColumn()"><i class="fa fa-minus"> 删除</i></button>
+                <div class="col-sm-12 select-table table-striped">
+                    <table id="bootstrap-table"></table>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="row">
+    <div class="col-sm-offset-5 col-sm-10">
+<!--        <button type="button" class="btn btn-sm btn-primary" onclick="submitHandler()"><i class="fa fa-check"></i>保 存</button>&nbsp;-->
+<!--        <button type="button" class="btn btn-sm btn-danger" onclick="closeItem()"><i class="fa fa-reply-all"></i>关 闭 </button>-->
+    </div>
+</div>
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: datetimepicker-js" />
+<script th:src="@{/js/jquery.tmpl.js}"></script>
+<script th:inline="javascript">
+    $(function() {
+        var options = {
+            pagination: false,
+            showSearch: false,
+            showRefresh: false,
+            showToggle: false,
+            showColumns: false,
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field: 'index',
+                    align: 'center',
+                    title: "序号",
+                    formatter: function (value, row, index) {
+                        var columnIndex = $.common.sprintf("<input type='hidden' name='index' value='%s'>", $.table.serialNumber(index));
+                        return columnIndex + $.table.serialNumber(index);
+                    }
+                },
+                {
+                    field: 'options',
+                    align: 'center',
+                    title: '商品名称',
+                    formatter: function(value, row, index) {
+                        var html = $.common.sprintf("<input class='form-control' type='text' name='selectOptions[%s].options' value='%s'>", index, value);
+                        return html;
+                    }
+                }]
+
+        };
+        $.table.init(options);
+    });
+
+    /* 主子表-提交 */
+    function submitHandler(index, layero){
+        var data = $("#form-add").serializeArray();
+        if(data[3] === undefined ){
+            $.modal.msg("无选项！！！");
+        }else {
+            if($.validate.form("form-add")) {
+                // debugger;
+                $.operate.saveModal("/admin/question/library/addSelectTopic", data, function (res) {
+                    if(res.code === 0){
+
+                        if(confirm("添加成功，请刷新。")){
+
+                            $.modal.close();
+                        };
+
+                    }else {
+                        $.modal.msg(res.msg);
+                    }
+                });
+            }
+        }
+        let map = data.map(n => console.log(n));
+        console.log(map)
+    }
+
+    function addColumn() {
+        var count = $("#" + table.options.id).bootstrapTable('getData').length;
+        sub.editColumn();
+
+        $("#" + table.options.id).bootstrapTable('insertRow', {
+            index: count,
+            row: {
+                index: $.table.serialNumber(count),
+                options: "",
+            }
+        });
+    }
+</script>
+</body>
+</html>

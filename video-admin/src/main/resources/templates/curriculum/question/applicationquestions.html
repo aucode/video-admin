@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('主子表提交')" />
+    <th:block th:include="include :: datetimepicker-css" />
+</head>
+<body class="gray-bg">
+<div class="main-content">
+    <form id="form-add" class="form-horizontal">
+        <input name="libraryId" th:value="${libraryId}" type="hidden" id="libraryId"/>
+        <h4 class="form-header h4">问答题</h4>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label class="col-xs-2 control-label">题目：</label>
+                    <div class="col-xs-10">
+                        <textarea name="options" maxlength="500" class="form-control" rows="3" required></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label class="col-xs-2 control-label">解析：</label>
+                    <div class="col-xs-10">
+                        <textarea name="analysis" maxlength="500" class="form-control" rows="3" required></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="row">
+    <div class="col-sm-offset-5 col-sm-10">
+<!--        <button type="button" class="btn btn-sm btn-primary" onclick="submitHandler()"><i class="fa fa-check"></i>保 存</button>&nbsp;-->
+<!--        <button type="button" class="btn btn-sm btn-danger" onclick="closeItem()"><i class="fa fa-reply-all"></i>关 闭 </button>-->
+    </div>
+</div>
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: datetimepicker-js" />
+<script th:src="@{/js/jquery.tmpl.js}"></script>
+<script th:inline="javascript">
+    /* 主子表-提交 */
+    function submitHandler(index, layero){
+        var data = $("#form-add").serializeArray();
+        if($.validate.form("form-add")) {
+            $.operate.saveModal("/admin/question/library/addApplicationQuestions", data, function (res) {
+                if(res.code === 0){
+                        $.modal.close();
+                    $.modal.msg("添加成功，请刷新。");
+                }else {
+                    $.modal.msg(res.msg);
+                }
+            });
+        }
+    }
+</script>
+</body>
+</html>

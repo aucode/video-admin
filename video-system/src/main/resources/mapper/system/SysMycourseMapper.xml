@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.video.system.mapper.SysMycourseMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="MycourseMap" type="com.video.system.domain.SysMycourse">
+        <id column="mycourse_id" property="mycourseId" />
+        <result column="user_id" property="userId" />
+        <result column="course_id" property="courseId" />
+        <result column="course_name" property="courseName" />
+        <result column="course_url" property="courseUrl" />
+        <result column="course_description" property="courseDescription" />
+        <result column="course_user_id" property="courseUserId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="MycourseSQL">
+        mycourse_id, user_id, course_id, course_name, course_url, course_description, course_user_id
+    </sql>
+
+    <select id="selectMycoursetList" parameterType="java.lang.Long" resultMap="MycourseMap">
+        SELECT
+        <include refid="MycourseSQL" />
+        FROM
+        sys_mycourse
+        <if test="userId != null">
+            where user_id = #{userId}
+        </if>
+    </select>
+
+    <insert id="addMycourseInfo" parameterType="com.video.system.domain.SysMycourse">
+        insert into sys_mycourse(user_id, course_id, course_name, course_url, course_description, course_user_id)
+        values (#{userId}, #{courseId}, #{courseName}, #{courseUrl}, #{courseDescription}, #{courseUserId})
+    </insert>
+</mapper>

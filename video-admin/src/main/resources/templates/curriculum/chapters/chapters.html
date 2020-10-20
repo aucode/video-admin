@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('章节信息')" />
+    <th:block th:include="include :: layout-latest-css" />
+    <th:block th:include="include :: ztree-css" />
+    <link th:href="@{/css/jsmodern-4.1.4.css}" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jsmodern-4.1.4.js}"></script>
+</head>
+<style>
+    body{background-color: #212121}
+    #video {
+        /*padding-top: 50px;*/
+        width: 100px;
+        height: 60px;
+        margin: 0 auto;
+        position: relative;
+    }
+
+    #video video {
+        width: 100%;
+        height: 100%;
+        object-fit: fill;
+    }
+
+    .VideoBtn {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        display: block;
+        width: 70px;
+        height: 70px;
+        margin-left: -35px;
+        margin-top: -35px;
+        cursor: pointer;
+        z-index: 10;
+    }
+</style>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+
+        </div>
+
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="$.operate.add()" >
+                <i class="fa fa-plus"></i> 新增
+            </a>
+
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: layout-latest-js" />
+<th:block th:include="include :: ztree-js" />
+<script th:inline="javascript">
+    var removeFlag = [[${@permission.hasPermi('curriculum:chapters:remove')}]];
+    var prefix = ctx + "curriculum/chapters";
+    var listId= [[${chaptersid}]];
+    var startHTML = "<div id='video'><video src='"+ctx;
+    var endHTML = "' id='videoShow'  muted></video></div>";
+    $(function() {
+        var options = {
+            url: prefix + "/list/"+listId,
+            createUrl: prefix + "/add/"+listId,
+            removeUrl:  prefix + "/rotation/remove",
+            modalName: "课程",
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field: 'chaptersId',
+                    title: '编号',
+                    formatter: function(value, row, index) {
+                        return index+1;
+                    }
+                },
+                {
+                    field: 'chaptersName',
+                    title: '课程名称',
+                    sortable: true
+                },
+                {
+                    field: 'chaptersUrl',
+                    title: '课程视频',
+                    sortable: true,
+                    formatter: function(value, row, index) {
+                        // return "http://120.79.14.229/"+ value;
+                        return startHTML+value+endHTML;
+                        // "<div id='video'><video src='"+ value +"' id='videoShow' autoplay muted></video></div>";
+                    }
+                },
+                {
+                    field: 'chaptersPurchase',
+                    title: '可免费观看',
+                    sortable: true,
+                    formatter: function(value, row, index) {
+                        if(value == 0) return "不需要购买";
+                        else return "<span style='color: red'>需要购买</span>";
+                    }
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.chaptersId + '\')"><i class="fa fa-remove"></i>删除</a> ');
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+    });
+</script>
+</body>
+
+<!--视频插件调用方法-->
+<script>
+    $(function () {
+        //视频
+        jsModern.video("#video");
+        //播放视频
+        $(".VideoBtn").click(function () {
+            var video = document.getElementById("videoShow");
+            video.play();
+            $('.VideoBtn').hide();
+        })
+        //监听视频的播放状态
+        // var video = document.getElementById("videoShow");
+        var video = document.getElementsByTagName("video");
+        console.log(video)
+        video.oncanplay = function () {
+            $(".VideoBtn").show();
+            //$("#video").attr("poster","");
+        }
+        //视频播放事件
+        video.onplay = function () {
+            $("#videoShow").attr("poster", "");
+            $(".VideoBtn").hide();
+        };
+        video.onplaying = function () {
+            $(".VideoBtn").hide();
+        };
+
+        //视频暂停事件
+        video.onpause = function () {
+            $(".VideoBtn").show();
+        };
+        //点击视频周围暂停播放图片出现
+        video.onclick = function () {
+            if (video.paused) {
+                $(".VideoBtn").hide();
+                video.play();
+            } else {
+                $(".VideoBtn").show();
+                video.pause();
+            }
+        };
+    })
+</script>
+</html>

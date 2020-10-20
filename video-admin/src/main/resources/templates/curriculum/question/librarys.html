@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <title>题库</title>
+    <th:block th:include="include :: header('题库')" />
+    <th:block th:include="include :: layout-latest-css" />
+</head>
+<body class="gray-bg">
+<div class="container-div" style="height: 70px">
+    <div class="row">
+<div class="col-sm-12 search-collapse">
+    <form id="dept-form">
+        <div class="select-list">
+            <ul>
+                <li>
+                    <a class="btn btn-success" onclick="addSelectTopic()" >
+                        <i class="fa fa-plus"></i> 新增选择题
+                    </a>
+                    <a class="btn btn-success" onclick="addApplicationQuestions()" >
+                        <i class="fa fa-plus"></i> 新增问答题
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </form>
+</div>
+    </div>
+</div>
+    <div class="row wrapper wrapper-content animated fadeInRight">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>题库浏览</h5>
+                </div>
+                <div class="ibox-content" id="content">
+<!--                    <h3 class="font-bold"> 题目</h3>-->
+<!--                    <p>A</p>-->
+<!--                    <p>B</p>-->
+<!--                    <p>C</p>-->
+<!--                    <p>D</p>-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: layout-latest-js" />
+<th:block th:include="include :: ztree-js" />
+<script th:inline="javascript">
+    var prefix = ctx + "question/library";
+    var libraryId= [[${libraryid}]];
+    $.ajax({
+        cache : true,
+        type : "GET",
+        url : prefix + "/librarylist/"+libraryId,
+        processData: false,
+        contentType: false,
+        error : function(request) {
+            // $.modal.alertError("系统错误");
+        },
+        success : function(data) {
+
+            var html = $("#content");
+            var str = "";
+            var i =1;
+            data.rows.map(function (n) {
+                str+="<h3 class='font-bold'>"+i+"、"+n.title+"</h3>";
+                n.selectOptions.map(function (n) {
+                    str+="<p>"+n.options+"</p>";
+                });
+                str+="<p><b>解析：</b>"+n.analyze+"</p>";
+                i++;
+            });
+            $.ajax({
+                cache : true,
+                type : "GET",
+                url : prefix + "/application/"+libraryId,
+                processData: false,
+                contentType: false,
+                error : function(request) {
+                    // $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    data.rows.map(function (n) {
+                        str+="<h3 class='font-bold'>"+i+"、"+n.options+"</h3>";
+                        str+="<p><b>解析：</b>"+n.analysis+"</p>";
+                        i++;
+                    });
+                    html.append(str);
+                }
+            });
+        }
+    });
+
+    function addSelectTopic()
+    {
+        $.modal.open("添加选择题",prefix + "/addSelectTopic/" + libraryId);
+    }
+    function addApplicationQuestions()
+    {
+        $.modal.open("添加应用题",prefix + "/addApplicationQuestions/" + libraryId);
+    }
+</script>
+</body>
+</html>

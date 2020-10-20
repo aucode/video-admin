@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.video.system.mapper.SysCourseClassMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="CourseClassMap" type="com.video.system.domain.SysCourseClass">
+        <id column="class_id" property="classId" />
+        <result column="class_name" property="className" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="CourseClassSQL">
+        class_id, class_name
+    </sql>
+
+    <select id="checkTypeUnique" parameterType="String" resultType="int">
+        select count(1) from sys_course_class where class_name = #{className}
+    </select>
+
+    <insert id="insertCourseClass" parameterType="com.video.system.domain.SysCourseClass">
+        INSERT INTO sys_course_class (class_name) VALUES (#{className})
+    </insert>
+
+    <select id="selectCourseClassList" resultMap="CourseClassMap">
+        select <include refid="CourseClassSQL" /> from sys_course_class
+        <if test="className != null and className != ''">
+            where class_name like concat('%', #{className}, '%')
+        </if>
+         ORDER BY class_id DESC
+    </select>
+
+    <delete id="deleteCourseClassByCclassIds" parameterType="Long">
+        delete from sys_course_class where class_id in
+        <foreach collection="array" item="classId" open="(" separator="," close=")">
+            #{classId}
+        </foreach>
+    </delete>
+    <select id="selectCourseClassByCById" parameterType="Long" resultMap="CourseClassMap">
+        select <include refid="CourseClassSQL" /> from sys_course_class where class_id = #{classid}
+    </select>
+
+    <select id="checkCourseClassNameUnique" parameterType="String" resultMap="CourseClassMap">
+        select <include refid="CourseClassSQL" /> from sys_course_class where class_name = #{className}
+    </select>
+
+    <update id="updateCourseClass" parameterType="com.video.system.domain.SysCourseClass">
+        UPDATE sys_course_class SET class_name = #{className} where class_id = #{classId}
+    </update>
+
+
+</mapper>

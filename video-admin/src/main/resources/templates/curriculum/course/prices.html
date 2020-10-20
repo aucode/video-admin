@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <th:block th:include="include :: header('表单构建器')" />
+    <th:block th:include="include :: datetimepicker-css" />
+</head>
+<style>
+    .droppable-active{background-color:#ffe!important}.tools a{cursor:pointer;font-size:80%}.form-body .col-md-6,.form-body .col-md-12{min-height:400px}.draggable{cursor:move}
+    .form-group{
+        height: 40px;
+    }
+</style>
+<body>
+<form  class="form-horizontal m" id="form-course-add">
+    <div th:if="${prices.pricesId} ne null" style="padding-top: 20px;">
+        <div class="col-md-12">
+            <div class="form-group" hidden>
+                <label class="col-sm-3 control-label">课程：</label>
+                <div class="col-sm-9">
+                    <input class="form-control-static" name="pricesId" th:value="${prices.pricesId}"/>
+                    <input class="form-control-static" name="courseId" th:value="${prices.courseId}"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">价格：</label>
+                <div class="col-sm-9">
+                    <input type="text" name="coutsePrices" th:value="${prices.coutsePrices}" class="form-control"
+                           placeholder="请输入价格" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">折扣：</label>
+                <div class="col-sm-9">
+                    <label class="radio-box">
+                        <input type="radio" th:checked="${prices.coutseDiscounted == '1'} ? true : false" value="1"
+                               id="optionsRadios1" name="coutseDiscounted">有</label>
+                    <label class="radio-box">
+                        <input type="radio" th:checked="${prices.coutseDiscounted == '0'} ? true : false" value="0"
+                               id="optionsRadios2" name="coutseDiscounted">无</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">优惠后价格：</label>
+                <div class="col-sm-9">
+                    <input type="text" name="discountedPrice" th:value="${prices.discountedPrice}" class="form-control"
+                           placeholder="请输入价格" required>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:if="${prices.pricesId} eq null" style="padding-top: 20px;">
+        <div class="col-md-12">
+            <div class="form-group" hidden>
+                <label class="col-sm-3 control-label">课程：</label>
+                <div class="col-sm-9">
+                    <input type="text" name="courseId" th:value="${prices.courseId}">
+                    <input type="text" name="pricesId" th:value="${prices.pricesId}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">价格：</label>
+                <div class="col-sm-9">
+                    <input type="text" name="coutsePrices" class="form-control" placeholder="请输入价格" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">折扣：</label>
+                <div class="col-sm-9">
+                    <label class="radio-box">
+                        <input type="radio" value="1" id="optionsRadios1" name="coutseDiscounted">有</label>
+                    <label class="radio-box">
+                        <input type="radio" checked value="0" id="optionsRadios2" name="coutseDiscounted">无</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">优惠后价格：</label>
+                <div class="col-sm-9">
+                    <input type="text" name="discountedPrice" class="form-control" placeholder="请输入价格" required>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+</body>
+<th:block th:include="include :: footer" />
+<script th:src="@{/js/jquery-ui-1.10.4.min.js}"></script>
+<th:block th:include="include :: datetimepicker-js" />
+<script th:src="@{/ajax/libs/beautifyhtml/beautifyhtml.js}"></script>
+<script type="text/javascript">
+    var prefix = ctx + "curriculum/prices";
+    function submitHandler() {
+        if ($.validate.form("form-course-add")) {
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : prefix + "/add",
+                data : {
+                    "pricesId": $("input[name='pricesId']").val(),
+                    "coutsePrices": $("input[name='coutsePrices']").val(),
+                    "coutseDiscounted": $('input[name="coutseDiscounted"]:checked ').val(),
+                    "discountedPrice": $("input[name='discountedPrice']").val(),
+                    "courseId": $("input[name='courseId']").val()
+                },
+                async : false,
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    $.operate.successCallback(data);
+                }
+            });
+        }
+    }
+</script>
+</html>

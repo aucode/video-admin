@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.video.system.mapper.SysApplicationQuestionsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.video.system.domain.SysApplicationQuestions">
+        <id column="options_id" property="optionsId" />
+        <result column="options" property="options" />
+        <result column="analysis" property="analysis" />
+        <result column="library_id" property="libraryId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        options_id, options, analysis, library_id
+    </sql>
+
+    <insert id="addSaveApplicationQuestions" parameterType="com.video.system.domain.SysApplicationQuestions">
+        insert into sys_application_questions(options, analysis, library_id)
+        values(#{options},#{analysis},#{libraryId})
+    </insert>
+
+</mapper>

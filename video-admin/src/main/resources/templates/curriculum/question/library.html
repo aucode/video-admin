@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <title>题库</title>
+    <th:block th:include="include :: header('题库')" />
+    <th:block th:include="include :: layout-latest-css" />
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="$.operate.add()" >
+                <i class="fa fa-plus"></i> 新增
+            </a>
+            <a class="btn btn-primary single disabled" onclick="$.operate.edit()">
+                <i class="fa fa-edit"></i> 修改
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: layout-latest-js" />
+<th:block th:include="include :: ztree-js" />
+<script th:inline="javascript">
+    var prefix = ctx + "question/library";
+
+    $(function() {
+        var options = {
+            url: prefix + "/list",
+            createUrl: prefix + "/add",
+            updateUrl: prefix+"/edit/{id}",
+            removeUrl: prefix + "/remove",
+            detailUrl: prefix +"/view/title/{id}",
+            modalName: "课程",
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field: 'libraryId',
+                    title: '编号',
+                    formatter: function(value, row, index) {
+                        return index+1;
+                    }
+                },
+                {
+                    field: 'title',
+                    title: '课程名称',
+                    sortable: true
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        // $.operate.detail(+'+row.courseId+');
+                        actions.push('<a class="btn btn-success btn-xs " href="javascript:void(0)" onclick="$.modal.openTab(\'查看题目\',\''+ctx+'/question/library/view/title/'+row.libraryId+'\');"><i class="fa fa-edit"></i>查看题目</a> ');
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+    });
+</script>
+</body>
+</html>

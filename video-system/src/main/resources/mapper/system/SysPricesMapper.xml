@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.video.system.mapper.SysPricesMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="PricesMap" type="com.video.system.domain.SysPrices">
+        <id column="prices_id" property="pricesId" />
+        <result column="coutse_prices" property="coutsePrices" />
+        <result column="coutse_discounted" property="coutseDiscounted" />
+        <result column="discounted_price" property="discountedPrice" />
+        <result column="course_id" property="courseId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="PricesSQL">
+        prices_id, coutse_prices, coutse_discounted, discounted_price, course_id
+    </sql>
+
+    <insert id="addCoursePrices" parameterType="com.video.system.domain.SysPrices">
+        INSERT INTO sys_prices(coutse_prices, coutse_discounted, discounted_price, course_id)
+                       VALUES(#{coutsePrices}, #{coutseDiscounted}, #{discountedPrice}, #{courseId});
+    </insert>
+    <update id="updateCoursePrices" parameterType="com.video.system.domain.SysPrices">
+        UPDATE sys_prices SET
+        <if test="coutsePrices != null and coutsePrices != ''">
+             coutse_prices = #{coutsePrices}
+        </if>
+        <if test="coutseDiscounted != null and coutseDiscounted != ''">
+             ,coutse_discounted = #{coutseDiscounted}
+        </if>
+        <if test="discountedPrice != null and discountedPrice != ''">
+             ,discounted_price = #{discountedPrice}
+        </if>
+        where prices_id = #{pricesId}
+    </update>
+
+    <select id="selectPricesByPricesId" parameterType="Long" resultMap="PricesMap">
+        SELECT <include refid="PricesSQL" /> FROM sys_prices where course_id = #{pricesId} limit 1
+    </select>
+</mapper>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.video.system.mapper.SysShoppingCartMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="ShoppingCartMap" type="com.video.system.domain.SysShoppingCart">
+        <id column="cart_id" property="cartId" />
+        <result column="user_id" property="userId" />
+        <result column="course_id" property="courseId" />
+        <result column="course_name" property="courseName" />
+        <result column="user_name" property="userName" />
+        <result column="course_url" property="courseUrl" />
+        <result column="course_description" property="courseDescription" />
+        <result column="course_user_id" property="courseUserId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="ShoppingCartSQL">
+        ${alias}.cart_id, ${alias}.user_id, ${alias}.course_id
+    </sql>
+
+    <select id="selectShoppingCartList" parameterType="java.lang.Long" resultMap="ShoppingCartMap">
+    SELECT
+        <include refid="ShoppingCartSQL"><property name="alias" value="sc"/></include>,
+        su.user_name,
+        co.course_name,
+        co.course_url,
+        co.course_description,
+        co.course_user_id
+    FROM
+        sys_shopping_cart sc
+        LEFT JOIN sys_course co ON sc.course_id = co.course_id
+        LEFT JOIN sys_user su ON co.course_user_id = su.user_id
+        <if test="userId != null">
+            where sc.user_id = #{userId}
+        </if>
+    </select>
+
+    <insert id="addCartInfo" parameterType="com.video.system.domain.SysShoppingCart">
+        insert into sys_shopping_cart(user_id,course_id)
+        values (${userId},${courseId})
+    </insert>
+    <delete id="deleteCartInfo" parameterType="com.video.system.domain.SysShoppingCart">
+        DELETE FROM sys_shopping_cart WHERE cart_id = #{cartId}
+    </delete>
+</mapper>

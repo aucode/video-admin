@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('课程购买')" />
+    <th:block th:include="include :: layout-latest-css" />
+    <th:block th:include="include :: ztree-css" />
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="btn-group-sm" id="toolbar" role="group">
+
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: layout-latest-js" />
+<th:block th:include="include :: ztree-js" />
+<script th:inline="javascript">
+    var prefix = ctx + "curriculum/mycourse";
+
+    $(function() {
+        var options = {
+            url: prefix + "/list",
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field: 'mycourseId',
+                    title: '编号',
+                    formatter: function(value, row, index) {
+                        return index+1;
+                    }
+                },
+                {
+                    field: 'courseName',
+                    title: '课程名称',
+                    sortable: true
+                },
+                {
+                    field: 'courseUrl',
+                    title: '课程封面',
+                    sortable: true,
+                    formatter: function(value, row, index) {
+                        return $.table.imageView(ctx+value, '/profile/avatar');
+                    }
+                },
+                {
+                    field: 'courseDescription',
+                    title: '课程介绍',
+                    sortable: true
+                }]
+        };
+        $.table.init(options);
+    });
+</script>
+</body>
+</html>
